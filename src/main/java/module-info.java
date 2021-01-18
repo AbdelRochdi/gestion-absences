@@ -1,9 +1,13 @@
-/* doesn't work with source level 1.8:
-module com.mycompany.gestiondesabsences {
+module ma.youcode {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
+    requires commons.dbcp2;
+    requires java.management;
 
-    opens com.mycompany.gestiondesabsences to javafx.fxml;
-    exports com.mycompany.gestiondesabsences;
+    opens ma.youcode.main to javafx.fxml;
+    exports ma.youcode.main;
+
+    opens ma.youcode.controllers to javafx.fxml;
+    exports ma.youcode.controllers;
 }
-*/
