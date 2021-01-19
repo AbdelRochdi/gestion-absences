@@ -12,16 +12,14 @@ public class Connexion {
         String username = "root";
         String password = "";
 
-        if (singleDataSource == null){
+        if (singleDataSource == null) {
             singleDataSource = new BasicDataSource();
-            singleDataSource.setInitialSize(5);
+            singleDataSource.setInitialSize(10);
             singleDataSource.setUrl(url);
             singleDataSource.setUsername(username);
             singleDataSource.setPassword(password);
 
         }
-
-
         return singleDataSource;
     }
 
