@@ -9,6 +9,11 @@ module ma.youcode {
     opens ma.youcode.main to javafx.fxml;
     exports ma.youcode.main;
 
+    opens ma.youcode.models to javafx.fxml;
+    exports ma.youcode.models;
+
+
+
     opens ma.youcode.controllers to javafx.fxml;
     exports ma.youcode.controllers;
 }
