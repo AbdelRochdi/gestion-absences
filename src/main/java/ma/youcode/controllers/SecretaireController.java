@@ -1,26 +1,24 @@
 package ma.youcode.controllers;
 
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.AccessibleAttribute;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import ma.youcode.dao.SecretaireDao;
-import ma.youcode.dao.SecretaireDaoImpl;
-import ma.youcode.models.Absences;
+import ma.youcode.dao.*;
 
 import java.sql.Date;
 import java.time.LocalDate;
-
+import java.util.ArrayList;
 public class SecretaireController {
 
     @FXML
@@ -28,175 +26,155 @@ public class SecretaireController {
     @FXML
     private ComboBox<String> comboBoxPromoList;
     @FXML
+    private ComboBox<String> comboBoxClasseBilan;
+    @FXML
+    private ComboBox<String> comboBoxPromoBilan;
+    @FXML
     private AnchorPane comboBoxListSearch;
     @FXML
     private AnchorPane comboBoxBilanSearch;
     @FXML
-    private TableView tableViewBilan;
+    private DatePicker startDateBilan;
     @FXML
-    private TableColumn colListeApprenant;
+    private DatePicker endDateBilan;
     @FXML
-    private TableColumn colJan;
+    private TableView<Absence> tableViewBilan;
     @FXML
-    private TableColumn colFeb;
+    private TableColumn<Absence, String> colBilanNom;
     @FXML
-    private TableColumn colMar;
+    private TableColumn<Absence, String> colBilanPrenom;
     @FXML
-    private TableColumn colApr;
+    private TableColumn<Absence, String> colBilanTel;
     @FXML
-    private TableColumn colMay;
+    private TableColumn<Absence, Integer> colBilanNumAbsences;
     @FXML
-    private TableColumn colJun;
+    private TableView<Absence> tableViewList;
     @FXML
-    private TableColumn colJul;
+    private TableColumn<Absence, String> colListNom;
     @FXML
-    private TableColumn colAug;
+    private TableColumn<Absence, String> colListPrenom;
     @FXML
-    private TableColumn colSep;
+    private TableColumn<Absence, String> colListTel;
     @FXML
-    private TableColumn colOct;
-    @FXML
-    private TableColumn colNov;
-    @FXML
-    private TableColumn colDec;
-    @FXML
-    private TableView<Absences> tableViewJustificatif;
-    @FXML
-    private TableColumn<Absences, String> colJustifNom;
-    @FXML
-    private TableColumn<Absences, String> colJustifPrenom;
-    @FXML
-    private TableColumn<Absences, String> colJustifTelephone;
-    @FXML
-    private TableColumn<Absences, String> colJustifDateAbsence;
-    @FXML
-    private TableColumn<Absences, String> colJustificatif;
-    @FXML
-    private TableView<Absences> tableViewList;
-    @FXML
-    private TableColumn<Absences, String> colListNom;
-    @FXML
-    private TableColumn<Absences, String> colListPrenom;
-    @FXML
-    private TableColumn<Absences, String> colListDateAbsence;
-    @FXML
-    private TableColumn<Absences, String> colListJutificatif;
-    @FXML
-    private ComboBox justificationChoiceComboBox;
+    private TableColumn<Absence, String> colListJutificatif;
     @FXML
     private DatePicker dateAbsence;
     @FXML
-    private Button saveBtn;
+    private Button backBtn;
+    @FXML
+    private Button bilanBtn;
 
     @FXML
     private void initialize() {
         dateAbsence.setValue(LocalDate.now());
+        ClasseDao classeDao = new ClasseDaoImpl();
+        PromoDao promoDao = new PromoDaoImpl();
+        ArrayList<String> classeList = classeDao.getClasseValues();
+        ArrayList<String> promoList = promoDao.getPromoValues();
+        for (int i = 0; i< classeList.size(); i++ ){
+            comboBoxClasseBilan.getItems().add(classeList.get(i));
+            comboBoxClasseList.getItems().add(classeList.get(i));
+        }
+        for (int i = 0; i<promoList.size(); i++ ){
+            comboBoxPromoBilan.getItems().add(promoList.get(i));
+            comboBoxPromoList.getItems().add(promoList.get(i));
+        }
     }
 
     @FXML
-    private void showComboxBoxSearch () {
-        comboBoxBilanSearch.setVisible(false);
-        tableViewJustificatif.setVisible(false);
-        tableViewBilan.setVisible(false);
-        justificationChoiceComboBox.setVisible(false);
-        saveBtn.setVisible(false);
-        comboBoxBilanSearch.setVisible(false);
-        tableViewList.setVisible(true);
-        comboBoxListSearch.setVisible(true);
-    }
-
-    @FXML
-    private void showComboxBoxJustificatif () {
-        comboBoxListSearch.setVisible(false);
-        comboBoxBilanSearch.setVisible(false);
-        tableViewBilan.setVisible(false);
-        tableViewList.setVisible(false);
-        justificationChoiceComboBox.setVisible(true);
-        saveBtn.setVisible(true);
-        tableViewJustificatif.setVisible(true);
-    }
-
-    @FXML
-    private void showComboxBoxBilan() {
-        comboBoxListSearch.setVisible(false);
-        tableViewJustificatif.setVisible(false);
-        tableViewList.setVisible(false);
-        justificationChoiceComboBox.setVisible(false);
-        saveBtn.setVisible(false);
-        comboBoxBilanSearch.setVisible(true);
-        tableViewBilan.setVisible(true);
-    }
-
-    @FXML
-    private void showTableViewList () {
+    private void showAbsences() {
         String classe = comboBoxClasseList.getValue();
         String promo = comboBoxPromoList.getValue();
         SecretaireDao secretaire = new SecretaireDaoImpl();
-        ObservableList<Absences> absences = secretaire.getAllAbsencesByClasse(classe, promo, Date.valueOf(dateAbsence.getValue()));
+        ObservableList<Absence> absences = secretaire.getAllAbsencesByClasse(classe, promo, Date.valueOf(dateAbsence.getValue()));
 
-        if (comboBoxPromoList.getValue() != null && comboBoxClasseList.getValue() != null) {
-            getAbsencesData(absences);
-            tableViewList.setVisible(true);
-            tableViewList.setOnMouseClicked((MouseEvent event) -> {
-                if (event.getClickCount() == 1) {
-                    // check the table's selected item and get selected item
-                    if (tableViewList.getSelectionModel().getSelectedItem() != null) {
-                        ObservableList<Absences> absencesJustificatif = FXCollections.observableArrayList();
-                        Absences absence = tableViewList.getSelectionModel().getSelectedItem();
-                        absencesJustificatif.add(absence);
-                        colJustifNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-                        colJustifPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
-                        colJustifTelephone.setCellValueFactory(new PropertyValueFactory<>("tel"));
-                        colJustifDateAbsence.setCellValueFactory(new PropertyValueFactory<>("date"));
-                        colJustificatif.setCellValueFactory(new PropertyValueFactory<>("justification"));
-                        tableViewJustificatif.setItems(absencesJustificatif);
-                        saveBtn.setOnAction(actionEvent -> {
-                            updateAbsencesData(secretaire, absence, absences);
-                        });
-                    }
-                }
-            });
+        if (classe != null && promo != null) {
+            tableViewList.setEditable(true);
+            removeScrollBar(tableViewList);
+                ObservableList<String> justificationState = FXCollections.observableArrayList();
+                justificationState.add("Approuvé");
+                justificationState.add("Refusé");
+                colListNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
+                colListPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
+                colListTel.setCellValueFactory(new PropertyValueFactory<>("tel"));
+                colListJutificatif.setCellValueFactory(new PropertyValueFactory<>("justification"));
+                colListJutificatif.setCellFactory(ComboBoxTableCell.forTableColumn(justificationState));
+                colListJutificatif.setOnEditCommit(absencesStringCellEditEvent -> {
+                    Absence absence = absencesStringCellEditEvent.getRowValue();
+                    absence.setJustification(absencesStringCellEditEvent.getNewValue());
+                    secretaire.updateJustificationUsers(absence.getId_absence(), absence.getJustification());
+                });
+                tableViewList.setItems(absences);
+
+        } else if (classe == null && promo == null) {
+            alertBoxDisplay("S'il vous plait, entez tous les champs nécessaires\n\t\t     pour obtenir le résultat!");
+        }
+    }
+
+    @FXML
+    private void showAbsencesBilan() {
+        String classe = comboBoxClasseBilan.getValue();
+        String promo = comboBoxPromoBilan.getValue();
+        SecretaireDao secretaire = new SecretaireDaoImpl();
+        if (classe != null && promo != null && startDateBilan.getValue() != null && endDateBilan.getValue() != null) {
+            ObservableList<Absence> absences = secretaire.getAllAbsencesStateByClasse(classe, promo, Date.valueOf(startDateBilan.getValue()), Date.valueOf(endDateBilan.getValue()));
+            colBilanNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
+            colBilanPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
+            colBilanTel.setCellValueFactory(new PropertyValueFactory<>("tel"));
+            colBilanNumAbsences.setCellValueFactory(new PropertyValueFactory<>("absencesTotal"));
+            tableViewBilan.setItems(absences);
+            removeScrollBar(tableViewBilan);
         } else {
-            alertBoxDisplay("Alert", "S'il vous enter la classe et la promo ansi la date correspondant");
+            alertBoxDisplay("S'il vous plait, entez tous les champs nécessaires\n\t\t     pour obtenir le résultat!");
+        }
+
+
+    }
+
+    @FXML
+    private void returnToAbsencesBilan() {
+        comboBoxListSearch.setVisible(false);
+        tableViewList.setVisible(false);
+        bilanBtn.setVisible(false);
+        comboBoxBilanSearch.setVisible(true);
+        tableViewBilan.setVisible(true);
+        backBtn.setVisible(true);
+    }
+
+    @FXML
+    private void showAbsencesList() {
+        comboBoxBilanSearch.setVisible(false);
+        tableViewBilan.setVisible(false);
+        backBtn.setVisible(false);
+        comboBoxListSearch.setVisible(true);
+        tableViewList.setVisible(true);
+        bilanBtn.setVisible(true);
+    }
+
+    public static <T extends Control> void removeScrollBar(T table) {
+        ScrollBar scrollBar = (ScrollBar) table.queryAccessibleAttribute(AccessibleAttribute.HORIZONTAL_SCROLLBAR);
+        if (scrollBar != null) {
+            scrollBar.setPrefHeight(0);
+            scrollBar.setMaxHeight(0);
+            scrollBar.setOpacity(0);
+            scrollBar.setVisible(false);
         }
     }
 
-    private void updateAbsencesData(SecretaireDao secretaire, Absences absence, ObservableList<Absences> absences) {
-        if (justificationChoiceComboBox.getValue() != null) {
-            secretaire.updateJustificationUsers(absence.getId_absence(), justificationChoiceComboBox.getValue().toString());
-            tableViewJustificatif.setVisible(false);
-            justificationChoiceComboBox.setVisible(false);
-            saveBtn.setVisible(false);
-            comboBoxListSearch.setVisible(true);
-            tableViewList.setVisible(true);
-            tableViewJustificatif.getItems().clear();
-            getAbsencesData(absences);
-
-        }
-    }
-
-    private void getAbsencesData(ObservableList<Absences> absences) {
-        colListNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        colListPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
-        colListDateAbsence.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colListJutificatif.setCellValueFactory(new PropertyValueFactory<>("justification"));
-        tableViewList.setItems(absences);
-    }
-
-
-    private void alertBoxDisplay(String title, String message) {
+    public static void alertBoxDisplay(String message) {
         Stage dialogWindow = new Stage();
         // prevent any user interaction outside of Dialog Box until Dialog Box closed
         dialogWindow.initModality(Modality.APPLICATION_MODAL);
-        dialogWindow.setTitle(title);
-        dialogWindow.setMinWidth(80);
+        dialogWindow.setTitle("Alerte");
+        dialogWindow.setMinWidth(500);
+        dialogWindow.setMinHeight(140);
         dialogWindow.setResizable(false);
         Label label = new Label(message);
-        Button closeBtn = new Button("Fermer");
-        closeBtn.setOnAction(e -> dialogWindow.close());
+        label.setStyle("-fx-font-weight: bold; -fx-font-size: 13; -fx-text-fill:  #252525");
         VBox wrapper = new VBox();
-        wrapper.getChildren().addAll(label, closeBtn);
         wrapper.setAlignment(Pos.CENTER);
+        wrapper.setStyle("-fx-padding: 10");
+        wrapper.getChildren().add(label);
         Scene scene = new Scene(wrapper);
         dialogWindow.setScene(scene);
         dialogWindow.showAndWait();

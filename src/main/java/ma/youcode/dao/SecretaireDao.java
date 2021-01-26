@@ -2,12 +2,11 @@ package ma.youcode.dao;
 
 
 import javafx.collections.ObservableList;
-import ma.youcode.models.Absences;
 
 import java.sql.Date;
 
 public interface SecretaireDao {
-    ObservableList<Absences> getAllAbsencesByClasse(String classeText, String promoText, Date date);
+    ObservableList<Absence> getAllAbsencesByClasse(String classeText, String promoText, Date date);
     void updateJustificationUsers(int id, String justification);
-    ObservableList<Absences> getAllAbsencesByYear(String classeText, String promoText);
+    ObservableList<Absence> getAllAbsencesStateByClasse(String classeText, String promoText, Date startDate, Date endDate);
 }

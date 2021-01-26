@@ -12,8 +12,6 @@ module ma.youcode {
     opens ma.youcode.models to javafx.fxml;
     exports ma.youcode.models;
 
-
-
     opens ma.youcode.controllers to javafx.fxml;
     exports ma.youcode.controllers;
 }

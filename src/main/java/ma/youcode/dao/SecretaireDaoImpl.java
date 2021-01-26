@@ -3,15 +3,14 @@ package ma.youcode.dao;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ma.youcode.connexion.Connexion;
-import ma.youcode.models.Absences;
 
 import javax.sql.DataSource;
 import java.sql.*;
 
 public class SecretaireDaoImpl implements SecretaireDao {
     @Override
-    public ObservableList<Absences> getAllAbsencesByClasse(String classeText, String promoText, Date date) {
-        ObservableList<Absences> absences = FXCollections.observableArrayList();
+    public ObservableList<Absence> getAllAbsencesByClasse(String classeText, String promoText, Date date) {
+        ObservableList<Absence> absences = FXCollections.observableArrayList();
         Connection connection = null;
         try {
             DataSource dataSource = Connexion.getSingleDataSource();
@@ -24,9 +23,9 @@ public class SecretaireDaoImpl implements SecretaireDao {
             preparedStatement.setString(2, promoText);
             preparedStatement.setDate(3, date);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Absences absence;
+            Absence absence;
             while(resultSet.next()) {
-                absence = new Absences(resultSet.getString("nom"), resultSet.getString("prenom"), resultSet.getDate("date"), resultSet.getString("tel"), resultSet.getInt("id_absence"),resultSet.getString("justification"));
+                absence = new Absence(resultSet.getString("nom"), resultSet.getString("prenom"), resultSet.getString("tel") ,resultSet.getString("justification"));
                 absences.add(absence);
             }
 
@@ -65,20 +64,25 @@ public class SecretaireDaoImpl implements SecretaireDao {
     }
 
     @Override
-    public ObservableList<Absences> getAllAbsencesByYear(String classeText, String promoText) {
-        ObservableList<Absences> absences = FXCollections.observableArrayList();
+    public ObservableList<Absence> getAllAbsencesStateByClasse(String classeText, String promoText, Date startDate, Date endDate) {
+        ObservableList<Absence> absences = FXCollections.observableArrayList();
         Connection connection = null;
         try {
             DataSource dataSource = Connexion.getSingleDataSource();
             connection = dataSource.getConnection();
-            String query = "";
+            String query = "SELECT utilisateurs.nom, utilisateurs.prenom, utilisateurs.tel, count(absences.date) AS 'n' FROM absences " +
+                    "RIGHT OUTER JOIN apprenant on absences.id_apprenant = apprenant .id_apprenant and (absences.date BETWEEN ? AND ?) " +
+                    "INNER JOIN utilisateurs on utilisateurs.id = apprenant.id_apprenant and apprenant.classe = ? and apprenant.promo = ? " +
+                    "GROUP BY utilisateurs.nom";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, classeText);
-            preparedStatement.setString(2, promoText);
+            preparedStatement.setDate(1, startDate);
+            preparedStatement.setDate(2, endDate);
+            preparedStatement.setString(3, classeText);
+            preparedStatement.setString(4, promoText);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Absences absence;
+            Absence absence;
             while(resultSet.next()) {
-                absence = new Absences(resultSet.getString("nom"), resultSet.getString("prenom"), resultSet.getDate("date"), resultSet.getString("tel"), resultSet.getInt("id_absence"),resultSet.getString("justification"));
+                absence = new Absence(resultSet.getString("nom"), resultSet.getString("prenom"), resultSet.getString("tel"), resultSet.getInt("n"));
                 absences.add(absence);
             }
 
