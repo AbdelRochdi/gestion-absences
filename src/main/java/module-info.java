@@ -4,6 +4,10 @@ module ma.youcode {
     requires java.sql;
     requires commons.dbcp2;
     requires java.management;
+    requires commons.validator;
+    requires java.prefs;
+    requires jbcrypt;
+
 
     opens ma.youcode.main to javafx.fxml;
     exports ma.youcode.main;
@@ -13,5 +17,7 @@ module ma.youcode {
 
     opens ma.youcode.models to javafx.base;
     exports ma.youcode.models;
+
+
 
 }
