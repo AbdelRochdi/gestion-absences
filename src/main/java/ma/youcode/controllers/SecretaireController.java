@@ -122,7 +122,7 @@ public class SecretaireController {
         String promo = comboBoxPromoBilan.getValue();
         SecretaireDao secretaire = new SecretaireDaoImpl();
         if (classe != null && promo != null && startDateBilan.getValue() != null && endDateBilan.getValue() != null) {
-            boolean areValidDates = (startDateBilan.getValue().compareTo(LocalDate.now()) < 0 && endDateBilan.getValue().compareTo(LocalDate.now()) < 0)
+            boolean areValidDates = (startDateBilan.getValue().compareTo(LocalDate.now()) <= 0 && endDateBilan.getValue().compareTo(LocalDate.now()) <= 0)
                                     || (startDateBilan.getValue().compareTo(LocalDate.now()) == 0 && endDateBilan.getValue().compareTo(LocalDate.now()) == 0);
             if (areValidDates) {
                 ObservableList<Absence> absences = secretaire.getAllAbsencesStateByClasse(classe, promo, Date.valueOf(startDateBilan.getValue()), Date.valueOf(endDateBilan.getValue()));
