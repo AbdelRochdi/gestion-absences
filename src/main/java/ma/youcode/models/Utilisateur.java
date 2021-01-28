@@ -10,6 +10,8 @@ public class Utilisateur {
     private String email;
     private String role;
     private String password;
+    public String classe;
+    public String promo;
 
     public Utilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role, String password) {
         this.id = id;
@@ -33,6 +35,12 @@ public class Utilisateur {
     }
 
     public Utilisateur() {
+    }
+
+    public Utilisateur(String nom, String prenom, String tel) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.tel = tel;
     }
 
     public int getId() {
@@ -97,5 +105,21 @@ public class Utilisateur {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getClasse() {
+        return classe;
+    }
+
+    public void setClasse(String classe) {
+        this.classe = classe;
+    }
+
+    public String getPromo() {
+        return promo;
+    }
+
+    public void setPromo(String promo) {
+        this.promo = promo;
     }
 }

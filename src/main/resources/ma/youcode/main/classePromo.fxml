@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="506.0" prefWidth="635.0" style="-fx-background-color: #e8ebf2;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.youcode.controllers.ClassePromoController">
+   <children>
+      <TableView fx:id="tvClasse" layoutX="21.0" layoutY="227.0" onMouseClicked="#handleMouseAction" prefHeight="253.0" prefWidth="270.0">
+        <columns>
+          <TableColumn fx:id="colClasseId" prefWidth="40.000003814697266" text="ID" />
+          <TableColumn fx:id="colClasseName" prefWidth="227.33332061767578" text="CLASSE" />
+        </columns>
+      </TableView>
+      <HBox layoutX="23.0" layoutY="174.0" prefHeight="41.0" prefWidth="284.0" spacing="15.0">
+         <children>
+            <Button fx:id="addClasseBtn" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="78.0" style="-fx-background-color: #1052a8;" text="Ajouter" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="updateClasseBtn" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="75.0" style="-fx-background-color: #1052a8;" text="Modifier" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="deleteClasseBtn" mnemonicParsing="false" onAction="#handleButtonAction" style="-fx-background-color: #1052a8;" text="Supprimer" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+         </children>
+      </HBox>
+      <VBox layoutX="23.0" layoutY="86.0" prefHeight="41.0" prefWidth="37.0" spacing="20.0">
+         <children>
+            <Label text="Id">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <Label text="Classe">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+         </children>
+      </VBox>
+      <VBox layoutX="94.0" layoutY="88.0" prefHeight="90.0" prefWidth="195.0" spacing="15.0">
+         <children>
+            <TextField fx:id="tfClasseId" />
+            <TextField fx:id="tfClasseName" />
+         </children>
+      </VBox>
+      <HBox layoutX="334.0" layoutY="176.0" prefHeight="41.0" prefWidth="284.0" spacing="15.0">
+         <children>
+            <Button fx:id="addPromoBtn" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="75.0" style="-fx-background-color: #1052a8;" text="Ajouter" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="updatePromoBtn" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="83.0" style="-fx-background-color: #1052a8;" text="Modifier" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="deletePromoBtn" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="92.0" style="-fx-background-color: #1052a8;" text="Supprimer" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+         </children>
+      </HBox>
+      <VBox layoutX="333.0" layoutY="89.0" prefHeight="59.0" prefWidth="55.0" spacing="20.0">
+         <children>
+            <Label text="Id">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <Label text="Promo">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+         </children>
+      </VBox>
+      <VBox layoutX="421.0" layoutY="88.0" prefHeight="90.0" prefWidth="195.0" spacing="15.0">
+         <children>
+            <TextField fx:id="tfPromoId" prefHeight="25.0" prefWidth="197.0" />
+            <TextField fx:id="tfPromoName" />
+         </children>
+      </VBox>
+      <TableView fx:id="tvPromo" layoutX="333.0" layoutY="227.0" onMouseClicked="#handleMouseAction" prefHeight="253.0" prefWidth="284.0">
+        <columns>
+          <TableColumn fx:id="colPromoId" prefWidth="39.33331298828125" text="ID" />
+          <TableColumn fx:id="colPromoName" prefWidth="241.33334350585938" text="PROMO" />
+        </columns>
+      </TableView>
+      <Label fx:id="classeError" layoutX="19.0" layoutY="164.0" prefHeight="17.0" prefWidth="165.0" textFill="#ec0a0a" />
+      <Label fx:id="promoError" layoutX="463.0" layoutY="164.0" prefHeight="17.0" prefWidth="165.0" textFill="#ec0a0a" />
+      <AnchorPane prefHeight="60.0" prefWidth="641.0" style="-fx-background-color: black;">
+         <children>
+            <VBox alignment="CENTER" layoutX="376.0" layoutY="11.0" prefHeight="39.0" prefWidth="100.0" style="-fx-background-color: white;">
+               <children>
+                  <Button fx:id="userBtn" mnemonicParsing="false" onAction="#handleButtonAction" style="-fx-background-color: white;" text="Utilisateurs" textFill="#0099ff">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" layoutX="476.0" layoutY="11.0" prefHeight="39.0" prefWidth="139.0" style="-fx-background-color: #0099ff;">
+               <children>
+                  <Button fx:id="cpBtn" alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="31.0" prefWidth="141.0" style="-fx-background-color: #0099ff;" text="Classe et Promo" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+            <ImageView fitHeight="40.0" fitWidth="170.0" layoutX="12.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@logo.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
