@@ -3,11 +3,13 @@ package ma.youcode.dao;
 import javafx.collections.ObservableList;
 import ma.youcode.models.*;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public interface AdminDao {
 
-    public int creerUtilisateur(String nom, String prenom, String date_naissance, String tel, String email, String role, String password);
+    public int creerUtilisateur(String nom, String prenom, String date_naissance, String tel, String email, String role, String password, InputStream image, int fileLength);
 
     public void ajouterApprenant(int id, String classe, String promo);
 
@@ -32,7 +34,7 @@ public interface AdminDao {
 
     public void supprimerFormateur(int id);
 
-    public void modifierUtilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role);
+    public void modifierUtilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role, InputStream image, int fileLength);
 
     public void modifierApprenant(int id, String classe, String promo);
 

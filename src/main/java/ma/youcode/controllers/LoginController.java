@@ -51,6 +51,7 @@ public class LoginController implements Initializable {
                     Stage stage = (Stage) loginBtn.getScene().getWindow();
                     App.setRoot("listeAbsence");
                     stage.sizeToScene();
+                    stage.centerOnScreen();
                 }else if (utilisateur.getRole().equals("Apprenant")){
                     Apprenant apprenant = admin.afficherApprenant(utilisateur.getId());
                     userPreference.put("classe", apprenant.getClasse());
@@ -59,14 +60,17 @@ public class LoginController implements Initializable {
                     Stage stage = (Stage) loginBtn.getScene().getWindow();
                     App.setRoot("apprenant");
                     stage.sizeToScene();
+                    stage.centerOnScreen();
                 }else if (utilisateur.getRole().equals("Secrétaire")){
                     Stage stage = (Stage) loginBtn.getScene().getWindow();
                     App.setRoot("secretaire");
                     stage.sizeToScene();
+                    stage.centerOnScreen();
                 }else if (utilisateur.getRole().equals("Admin")){
                     Stage stage = (Stage) loginBtn.getScene().getWindow();
                     App.setRoot("admin");
                     stage.sizeToScene();
+                    stage.centerOnScreen();
                 }
             }else{
                 errorLabel.setVisible(true);

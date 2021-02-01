@@ -18,47 +18,47 @@
 
 <AnchorPane prefHeight="661.0" prefWidth="895.0" style="-fx-background-color: #e8ebf2;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.youcode.controllers.AdminController">
    <children>
-      <TableView fx:id="tvUtilisateur" layoutX="40.0" layoutY="119.0" onMouseClicked="#handleMouseAction" prefHeight="331.0" prefWidth="819.0">
+      <TableView fx:id="tvUtilisateur" fixedCellSize="0.0" layoutX="40.0" layoutY="119.0" onMouseClicked="#handleMouseAction" prefHeight="259.0" prefWidth="819.0">
         <columns>
-          <TableColumn fx:id="colId" minWidth="0.0" prefWidth="0.0" text="ID" />
-          <TableColumn fx:id="colNom" prefWidth="108.00000381469727" text="NOM" />
-            <TableColumn fx:id="colPrenom" prefWidth="118.66661071777344" text="PRENOM" />
+          <TableColumn fx:id="colId" minWidth="0.0" prefWidth="40.66665267944336" text="ID" visible="false" />
+          <TableColumn fx:id="colNom" prefWidth="82.66665267944336" text="NOM" />
+            <TableColumn fx:id="colPrenom" prefWidth="104.66669464111328" text="PRENOM" />
             <TableColumn fx:id="colDateNaissance" prefWidth="146.66668701171875" text="DATE DE NAISSANCE" />
-            <TableColumn fx:id="colTel" prefWidth="76.66665649414062" text="TEL" />
-            <TableColumn fx:id="colEmail" prefWidth="90.66668701171875" text="EMAIL" />
-            <TableColumn fx:id="colRole" prefWidth="89.33331298828125" text="ROLE" />
-            <TableColumn fx:id="colClasse" prefWidth="92.666748046875" text="CLASSE" />
-            <TableColumn fx:id="colPromo" prefWidth="98.0" text="PROMO" />
+            <TableColumn fx:id="colTel" prefWidth="97.33340454101562" text="TEL" />
+            <TableColumn fx:id="colEmail" prefWidth="117.3333740234375" text="EMAIL" />
+            <TableColumn fx:id="colRole" prefWidth="93.33331298828125" text="ROLE" />
+            <TableColumn fx:id="colClasse" prefWidth="83.33331298828125" text="CLASSE" />
+            <TableColumn fx:id="colPromo" prefWidth="88.0" text="PROMO" />
         </columns>
       </TableView>
-      <VBox layoutX="349.0" layoutY="466.0" prefHeight="107.0" prefWidth="119.0" spacing="21.0">
+      <VBox layoutX="349.0" layoutY="394.0" prefHeight="107.0" prefWidth="119.0" spacing="21.0">
          <children>
             <Label text="Date de naissance">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font></Label>
-            <Label text="Tel">
+            <Label text="Telephone">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font></Label>
-            <Label fx:id="labelId" text="Id">
+            <Label text="Password">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
          </children>
       </VBox>
-      <VBox layoutX="499.0" layoutY="470.0" prefHeight="124.0" prefWidth="175.0" spacing="15.0">
+      <VBox layoutX="499.0" layoutY="398.0" prefHeight="124.0" prefWidth="175.0" spacing="15.0">
          <children>
-            <DatePicker fx:id="tfDateNaissance">
+            <DatePicker fx:id="tfDateNaissance" style="-fx-font-weight: bold;">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor></DatePicker>
             <TextField fx:id="tfTel" prefHeight="25.0" prefWidth="153.0" />
-            <TextField fx:id="tfId" />
+            <PasswordField fx:id="tfPassword" prefHeight="21.0" prefWidth="175.0" />
          </children>
       </VBox>
-      <VBox layoutX="722.0" layoutY="469.0" prefHeight="119.0" prefWidth="136.0" spacing="15.0">
+      <VBox layoutX="722.0" layoutY="397.0" prefHeight="119.0" prefWidth="136.0" spacing="15.0">
          <children>
             <ComboBox fx:id="cbRole" onAction="#handleComboBoxAction" prefWidth="150.0" promptText="Role" style="-fx-background-color: #0099ff; -fx-font-size: 13; -fx-font-weight: bold;" styleClass="cb">
                <cursor>
@@ -74,28 +74,27 @@
                </cursor></ComboBox>
          </children>
       </VBox>
-      <Label fx:id="errorLabel" layoutX="41.0" layoutY="579.0" prefHeight="25.0" prefWidth="564.0" textFill="#ec1114">
+      <Label fx:id="errorLabel" alignment="CENTER" layoutX="154.0" layoutY="578.0" prefHeight="25.0" prefWidth="564.0" textAlignment="CENTER" textFill="#ec1114">
          <font>
-            <Font size="13.0" />
+            <Font size="16.0" />
          </font>
       </Label>
-      <Button fx:id="searchBtn" layoutX="758.0" layoutY="75.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="100.0" style="-fx-background-color: #0099ff;" text="Rechercher" textFill="WHITE">
+      <Button fx:id="searchBtn" defaultButton="true" layoutX="758.0" layoutY="75.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyPressed="#handleButtonAction" prefHeight="29.0" prefWidth="100.0" style="-fx-background-color: #0099ff;" text="Recherche" textFill="WHITE">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <TextField fx:id="tfSearch" layoutX="584.0" layoutY="75.0" prefHeight="29.0" prefWidth="157.0" promptText="nom, prenom ou email" />
-      <PasswordField fx:id="tfPassword" layoutX="550.0" layoutY="616.0" prefHeight="29.0" prefWidth="149.0" />
-      <Button fx:id="editPasswordBtn" layoutX="724.0" layoutY="616.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="136.0" style="-fx-background-color: #0099ff;" text="Modifier Password" textFill="WHITE">
+      <TextField fx:id="tfSearch" layoutX="584.0" layoutY="75.0" prefHeight="29.0" prefWidth="157.0" promptText="Nom, prenom ou email" />
+      <Button fx:id="editPasswordBtn" layoutX="178.0" layoutY="616.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="136.0" style="-fx-background-color: #0099ff;" text="Modifier password" textFill="WHITE">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <VBox layoutX="40.0" layoutY="466.0" prefHeight="107.0" prefWidth="75.0" spacing="21.0">
+      <VBox layoutX="40.0" layoutY="394.0" prefHeight="107.0" prefWidth="75.0" spacing="21.0">
          <children>
             <Label text="Nom">
                <font>
@@ -109,27 +108,28 @@
                <font>
                   <Font name="System Bold" size="13.0" />
                </font></Label>
+            <Label text="Image">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
          </children>
       </VBox>
-      <VBox layoutX="126.0" layoutY="466.0" prefHeight="115.0" prefWidth="157.0" spacing="15.0">
+      <VBox layoutX="146.0" layoutY="394.0" prefHeight="115.0" prefWidth="157.0" spacing="15.0">
          <children>
             <TextField fx:id="tfNom" />
             <TextField fx:id="tfPrenom" />
             <TextField fx:id="tfEmail" />
          </children>
       </VBox>
-      <Label layoutX="468.0" layoutY="614.0" text="Password">
-         <font>
-            <Font name="System Bold" size="13.0" />
-         </font></Label>
       <AnchorPane prefHeight="60.0" prefWidth="895.0" style="-fx-background-color: black;">
          <children>
             <ImageView fitHeight="40.0" fitWidth="170.0" layoutX="35.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@logo.png" />
+                  <Image url="file:/C:/Users/Youcode/IdeaProjects/gestionDesAbsences/gestionDesAbsences/gestionDesAbsences/src/main/resources/ma/youcode/main/logo.png" />
                </image>
             </ImageView>
-            <HBox alignment="CENTER" layoutX="587.0" layoutY="11.0" prefHeight="39.0" prefWidth="119.0" style="-fx-background-color: #0099ff;">
+            <HBox alignment="CENTER" layoutX="450.0" layoutY="11.0" prefHeight="39.0" prefWidth="119.0" style="-fx-background-color: #0099ff; -fx-background-radius: 4 0 0 4;">
                <children>
                   <Button mnemonicParsing="false" style="-fx-background-color: #0099ff;" text="Utilisateurs" textFill="WHITE">
                      <font>
@@ -141,7 +141,7 @@
                   </Button>
                </children>
             </HBox>
-            <HBox alignment="CENTER" layoutX="706.0" layoutY="11.0" prefHeight="39.0" prefWidth="149.0" style="-fx-background-color: white;">
+            <HBox alignment="CENTER" layoutX="569.0" layoutY="11.0" prefHeight="39.0" prefWidth="149.0" style="-fx-background-color: white; -fx-background-radius: 0 4 4 0;">
                <children>
                   <Button fx:id="cpBtn" alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="173.0" style="-fx-background-color: white;" text="Classe et Promo" textFill="#0099ff">
                      <font>
@@ -153,9 +153,17 @@
                   </Button>
                </children>
             </HBox>
+            <Button fx:id="logoutBtn" layoutX="738.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="119.0" style="-fx-background-color: tomato;" text="Se déconnecter" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
          </children>
       </AnchorPane>
-      <HBox layoutX="40.0" layoutY="615.0" prefHeight="37.0" prefWidth="268.0" spacing="20.0">
+      <HBox layoutX="592.0" layoutY="612.0" prefHeight="37.0" prefWidth="268.0" spacing="20.0">
          <children>
             <Button fx:id="addBtn" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="71.0" style="-fx-background-color: #0099ff;" text="Ajouter" textFill="WHITE">
                <font>
@@ -182,5 +190,19 @@
             </Button>
          </children>
       </HBox>
+      <TextField fx:id="tfId" layoutX="100.0" layoutY="77.0" />
+      <Label fx:id="labelId" layoutX="65.0" layoutY="80.0" text="Id">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="39.0" layoutY="604.0" prefHeight="51.0" prefWidth="149.0" text="Pour modifier le mot de passe cliquez ici :" wrapText="true" />
+      <Label layoutX="40.0" layoutY="531.0" text="(Optionnel)" />
+      <Button fx:id="imageBtn" layoutX="148.0" layoutY="520.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="29.0" prefWidth="136.0" style="-fx-background-color: #0099ff;" text="Choisir une image" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+      <Label fx:id="tfImage" layoutX="148.0" layoutY="555.0" prefHeight="17.0" prefWidth="157.0" />
    </children>
 </AnchorPane>

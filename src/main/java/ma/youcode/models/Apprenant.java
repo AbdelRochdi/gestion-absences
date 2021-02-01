@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import ma.youcode.dao.FormateurDaoImpl;
 
+@SuppressWarnings("unchecked")
 public class Apprenant extends Utilisateur {
 
     private String classe;

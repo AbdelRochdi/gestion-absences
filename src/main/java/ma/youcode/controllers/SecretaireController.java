@@ -11,11 +11,15 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ma.youcode.dao.*;
+import ma.youcode.main.App;
 import ma.youcode.models.Absence;
+
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -62,7 +66,11 @@ public class SecretaireController {
     @FXML
     private DatePicker dateAbsence;
     @FXML
-    private Button backBtn;
+    private HBox hBoxList;
+    @FXML
+    private HBox hBoxBilan;
+    @FXML
+    private Button listBtn;
     @FXML
     private Button bilanBtn;
 
@@ -72,13 +80,13 @@ public class SecretaireController {
         SecretaireDao secretaireDao = new SecretaireDaoImpl();
         ArrayList<String> classeList = secretaireDao.getClasseValues();
         ArrayList<String> promoList = secretaireDao.getPromoValues();
-        for (int i = 0; i< classeList.size(); i++ ){
-            comboBoxClasseBilan.getItems().add(classeList.get(i));
-            comboBoxClasseList.getItems().add(classeList.get(i));
+        for (String classe : classeList) {
+            comboBoxClasseBilan.getItems().add(classe);
+            comboBoxClasseList.getItems().add(classe);
         }
-        for (int i = 0; i<promoList.size(); i++ ){
-            comboBoxPromoBilan.getItems().add(promoList.get(i));
-            comboBoxPromoList.getItems().add(promoList.get(i));
+        for (String promo : promoList) {
+            comboBoxPromoBilan.getItems().add(promo);
+            comboBoxPromoList.getItems().add(promo);
         }
     }
 
@@ -88,30 +96,37 @@ public class SecretaireController {
         String promo = comboBoxPromoList.getValue();
         SecretaireDao secretaire = new SecretaireDaoImpl();
             if (classe != null && promo != null) {
-                ObservableList<Absence> absences = secretaire.getAllAbsencesByClasse(classe, promo, Date.valueOf(dateAbsence.getValue()));
-                if (!absences.isEmpty()) {
-                    tableViewList.setEditable(true);
-                    removeScrollBar(tableViewList);
-                    ObservableList<String> justificationState = FXCollections.observableArrayList();
-                    justificationState.add("Approuvé");
-                    justificationState.add("Refusé");
-                    colListNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-                    colListPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
-                    colListTel.setCellValueFactory(new PropertyValueFactory<>("tel"));
-                    colListJutificatif.setCellValueFactory(new PropertyValueFactory<>("justification"));
-                    colListJutificatif.setCellFactory(ComboBoxTableCell.forTableColumn(justificationState));
-                    colListJutificatif.setOnEditCommit(absencesStringCellEditEvent -> {
-                        Absence absence = absencesStringCellEditEvent.getRowValue();
-                        absence.setJustification(absencesStringCellEditEvent.getNewValue());
-                        secretaire.updateJustificationUsers(absence.getId_absence(), absence.getJustification());
-                    });
-                    tableViewList.setItems(absences);
+                boolean isValidDate = dateAbsence.getValue().compareTo(LocalDate.now()) <= 0;
+                if (isValidDate) {
+                    ObservableList<Absence> absences = secretaire.getAllAbsencesByClasse(classe, promo, Date.valueOf(dateAbsence.getValue()));
+                    if (!absences.isEmpty()) {
+                        tableViewList.setEditable(true);
+                        removeScrollBar(tableViewList);
+                        ObservableList<String> justificationState = FXCollections.observableArrayList();
+                        justificationState.add("Approuvé");
+                        justificationState.add("Non approuvé");
+                        colListNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
+                        colListPrenom.setCellValueFactory(new PropertyValueFactory<>("prenom"));
+                        colListTel.setCellValueFactory(new PropertyValueFactory<>("tel"));
+                        colListJutificatif.setCellValueFactory(new PropertyValueFactory<>("justification"));
+                        colListJutificatif.setCellFactory(ComboBoxTableCell.forTableColumn(justificationState));
+                        colListJutificatif.setOnEditCommit(absencesStringCellEditEvent -> {
+                            Absence absence = absencesStringCellEditEvent.getRowValue();
+                            absence.setJustification(absencesStringCellEditEvent.getNewValue());
+                            secretaire.updateJustificationUsers(absence.getId_absence(), absence.getJustification());
+                            alertBoxDisplay("Justification modifié");
+                        });
+                        tableViewList.setItems(absences);
+                    } else {
+                        tableViewList.getItems().clear();
+                        alertBoxDisplay("Aucun résultats obtenus!");
+                    }
                 } else {
                     tableViewList.getItems().clear();
-                    alertBoxDisplay("Aucun résultats obtenus!");
+                    alertBoxDisplay("Impossible de dépasser la date d'aujourd'hui");
                 }
 
-            } else if (classe == null && promo == null) {
+            } else {
                 alertBoxDisplay("S'il vous plait, entrez tous les champs nécessaires\n\t\t     pour obtenir le résultat!");
             }
     }
@@ -122,8 +137,7 @@ public class SecretaireController {
         String promo = comboBoxPromoBilan.getValue();
         SecretaireDao secretaire = new SecretaireDaoImpl();
         if (classe != null && promo != null && startDateBilan.getValue() != null && endDateBilan.getValue() != null) {
-            boolean areValidDates = (startDateBilan.getValue().compareTo(LocalDate.now()) <= 0 && endDateBilan.getValue().compareTo(LocalDate.now()) <= 0)
-                                    || (startDateBilan.getValue().compareTo(LocalDate.now()) == 0 && endDateBilan.getValue().compareTo(LocalDate.now()) == 0);
+            boolean areValidDates = startDateBilan.getValue().compareTo(LocalDate.now()) <= 0 && endDateBilan.getValue().compareTo(LocalDate.now()) <= 0;
             if (areValidDates) {
                 ObservableList<Absence> absences = secretaire.getAllAbsencesStateByClasse(classe, promo, Date.valueOf(startDateBilan.getValue()), Date.valueOf(endDateBilan.getValue()));
                 if (!absences.isEmpty()) {
@@ -139,7 +153,7 @@ public class SecretaireController {
                 }
             } else {
                 tableViewBilan.getItems().clear();
-                alertBoxDisplay("Impossible de passer la date d'aujourd'hui");
+                alertBoxDisplay("Impossible de dépasser la date d'aujourd'hui");
             }
         } else {
             alertBoxDisplay("S'il vous plait, entrez tous les champs nécessaires\n\t\t     pour obtenir le résultat!");
@@ -152,20 +166,34 @@ public class SecretaireController {
     private void returnToAbsencesBilan() {
         comboBoxListSearch.setVisible(false);
         tableViewList.setVisible(false);
-        bilanBtn.setVisible(false);
         comboBoxBilanSearch.setVisible(true);
         tableViewBilan.setVisible(true);
-        backBtn.setVisible(true);
+        bilanBtn.setStyle("-fx-background-color:  #0099ff;  -fx-text-fill: #fdffff; -fx-font-weight: bold; -fx-font-size: 13;");
+        hBoxBilan.setStyle("-fx-background-color:  #0099ff; -fx-background-radius: 0 4 4 0; -fx-alignment: center;");
+        listBtn.setStyle("-fx-background-color:  #fdffff;  -fx-text-fill: #0099ff; -fx-font-weight: bold; -fx-font-size: 13;");
+        hBoxList.setStyle("-fx-background-color:  #fdffff; -fx-background-radius: 4 0 0 4; -fx-alignment: center;");
     }
 
     @FXML
     private void showAbsencesList() {
         comboBoxBilanSearch.setVisible(false);
         tableViewBilan.setVisible(false);
-        backBtn.setVisible(false);
         comboBoxListSearch.setVisible(true);
         tableViewList.setVisible(true);
-        bilanBtn.setVisible(true);
+        listBtn.setStyle("-fx-background-color:  #0099ff;  -fx-text-fill: #fdffff; -fx-font-weight: bold; -fx-font-size: 13;");
+        hBoxList.setStyle("-fx-background-color:  #0099ff; -fx-background-radius: 4 0 0 4; -fx-alignment: center;");
+        bilanBtn.setStyle("-fx-background-color:  #fdffff;  -fx-text-fill: #0099ff; -fx-font-weight: bold; -fx-font-size: 13;");
+        hBoxBilan.setStyle("-fx-background-color:  #fdffff; -fx-background-radius: 0 4 4 0; -fx-alignment: center;");
+
+    }
+
+    @FXML
+    private void logoutSecretaire() throws IOException {
+        Stage stage = (Stage) listBtn.getScene().getWindow();
+        App.setRoot("login");
+        stage.sizeToScene();
+        stage.centerOnScreen();
+
     }
 
     public static <T extends Control> void removeScrollBar(T table) {

@@ -1,25 +1,25 @@
 package ma.youcode.dao;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import ma.youcode.connexion.Connexion;
 import ma.youcode.models.*;
-
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class AdminDaoImpl implements AdminDao {
     @Override
-    public int creerUtilisateur(String nom, String prenom, String date_naissance, String tel, String email, String role, String password) {
+    public int creerUtilisateur(String nom, String prenom, String date_naissance, String tel, String email, String role, String password, InputStream image, int fileLength) {
         Connection conn = null;
         int gKey = 0;
         try {
 
             DataSource dataSource = Connexion.getSingleDataSource();
             conn = dataSource.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO utilisateurs (nom,prenom,date_naissance,tel,email,role,password) VALUES(?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO utilisateurs (nom,prenom,date_naissance,tel,email,role,password, image) VALUES(?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, nom);
             preparedStatement.setString(2, prenom);
             preparedStatement.setString(3, date_naissance);
@@ -27,6 +27,11 @@ public class AdminDaoImpl implements AdminDao {
             preparedStatement.setString(5, email);
             preparedStatement.setString(6, role);
             preparedStatement.setString(7, password);
+            if (fileLength != 0){
+                preparedStatement.setBinaryStream(8, image, fileLength);
+            }else{
+                preparedStatement.setBinaryStream(8, null);
+            }
             preparedStatement.executeUpdate();
             ResultSet rs = preparedStatement.getGeneratedKeys();
             System.out.println("Utilisateur Créé");
@@ -295,19 +300,35 @@ public class AdminDaoImpl implements AdminDao {
     }
 
     @Override
-    public void modifierUtilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role) {
+    public void modifierUtilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role, InputStream image, int fileLength) {
         Connection conn = null;
         try {
             DataSource dataSource = Connexion.getSingleDataSource();
             conn = dataSource.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement("UPDATE utilisateurs SET nom = ?, prenom = ?,date_naissance = ?,tel = ?,email = ?,role = ? WHERE id = ?");
-            preparedStatement.setString(1, nom);
-            preparedStatement.setString(2, prenom);
-            preparedStatement.setString(3, date_naissance);
-            preparedStatement.setString(4, tel);
-            preparedStatement.setString(5, email);
-            preparedStatement.setString(6, role);
-            preparedStatement.setInt(7, id);
+            PreparedStatement preparedStatement = null;
+            if (fileLength == 0){
+                preparedStatement = conn.prepareStatement("UPDATE utilisateurs SET nom = ?, prenom = ?,date_naissance = ?,tel = ?,email = ?,role = ? WHERE id = ?");
+                preparedStatement.setString(1, nom);
+                preparedStatement.setString(2, prenom);
+                preparedStatement.setString(3, date_naissance);
+                preparedStatement.setString(4, tel);
+                preparedStatement.setString(5, email);
+                preparedStatement.setString(6, role);
+                preparedStatement.setInt(7, id);
+            }else if (fileLength != 0){
+                preparedStatement = conn.prepareStatement("UPDATE utilisateurs SET nom = ?, prenom = ?,date_naissance = ?,tel = ?,email = ?,role = ?, image = ? WHERE id = ?");
+                preparedStatement.setString(1, nom);
+                preparedStatement.setString(2, prenom);
+                preparedStatement.setString(3, date_naissance);
+                preparedStatement.setString(4, tel);
+                preparedStatement.setString(5, email);
+                preparedStatement.setString(6, role);
+                preparedStatement.setBinaryStream(7, image, fileLength);
+                preparedStatement.setInt(8, id);
+            }
+
+
+
             preparedStatement.executeUpdate();
             System.out.println("Utilisateur Modifié");
         } catch (SQLException throwables) {
@@ -333,7 +354,7 @@ public class AdminDaoImpl implements AdminDao {
             preparedStatement.setString(2, promo);
             preparedStatement.setInt(3, id);
             preparedStatement.executeUpdate();
-            System.out.println("Utilisateur Modifié");
+            System.out.println("Apprenant Modifié");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
@@ -356,7 +377,7 @@ public class AdminDaoImpl implements AdminDao {
             preparedStatement.setString(1, classe);
             preparedStatement.setInt(2, id);
             preparedStatement.executeUpdate();
-            System.out.println("Utilisateur Modifié");
+            System.out.println("Formateur Modifié");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
@@ -383,7 +404,7 @@ public class AdminDaoImpl implements AdminDao {
             ResultSet rs = preparedStatement.executeQuery();
             Utilisateur utilisateur;
             if (rs.next()) {
-                utilisateur = new Utilisateur(rs.getInt("id"), rs.getString("nom"),rs.getString("prenom"),rs.getString("date_naissance"),rs.getString("tel"),rs.getString("email"),rs.getString("role"),rs.getString("password"));
+                utilisateur = new Utilisateur(rs.getInt("id"), rs.getString("nom"),rs.getString("prenom"),rs.getString("date_naissance"),rs.getString("tel"),rs.getString("email"),rs.getString("role"),rs.getString("password"), rs.getBinaryStream("image"));
                 return utilisateur;
             }
         } catch (SQLException throwables) {
@@ -412,7 +433,7 @@ public class AdminDaoImpl implements AdminDao {
             ResultSet rs = preparedStatement.executeQuery();
             Utilisateur utilisateur;
             if (rs.next()) {
-                utilisateur = new Utilisateur(rs.getInt("id"), rs.getString("nom"),rs.getString("prenom"),rs.getString("date_naissance"),rs.getString("tel"),rs.getString("email"),rs.getString("role"),rs.getString("password"));
+                utilisateur = new Utilisateur(rs.getInt("id"), rs.getString("nom"),rs.getString("prenom"),rs.getString("date_naissance"),rs.getString("tel"),rs.getString("email"),rs.getString("role"),rs.getString("password"), rs.getBinaryStream("image"));
                 return utilisateur;
             }
         } catch (SQLException throwables) {
@@ -595,7 +616,6 @@ public class AdminDaoImpl implements AdminDao {
             conn = dataSource.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM classes ");
             ResultSet rs = preparedStatement.executeQuery();
-            Utilisateur utilisateur;
             while (rs.next()) {
                 classes.add(rs.getString("titre"));
             }

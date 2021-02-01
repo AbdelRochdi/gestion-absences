@@ -1,5 +1,7 @@
 package ma.youcode.models;
 
+import java.io.InputStream;
+
 public class Utilisateur {
 
     private int id;
@@ -12,6 +14,27 @@ public class Utilisateur {
     private String password;
     public String classe;
     public String promo;
+    public InputStream image;
+
+    public Utilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role, String password, InputStream image) {
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.date_naissance = date_naissance;
+        this.tel = tel;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+        this.image = image;
+    }
+
+    public InputStream getImage() {
+        return image;
+    }
+
+    public void setImage(InputStream image) {
+        this.image = image;
+    }
 
     public Utilisateur(int id, String nom, String prenom, String date_naissance, String tel, String email, String role, String password) {
         this.id = id;

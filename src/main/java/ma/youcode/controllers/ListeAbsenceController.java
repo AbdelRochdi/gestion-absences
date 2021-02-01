@@ -6,17 +6,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import ma.youcode.dao.FormateurDaoImpl;
+import ma.youcode.main.App;
 import ma.youcode.models.Absence;
 import ma.youcode.models.Apprenant;
 import ma.youcode.models.Utilisateur;
 
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
+@SuppressWarnings("unchecked")
 public class ListeAbsenceController implements Initializable {
 
+    @FXML
+    private Button logoutBtn;
     @FXML
     private Label listeDateLabel;
     @FXML
@@ -43,11 +50,22 @@ public class ListeAbsenceController implements Initializable {
 
     Preferences userPreferences = Preferences.userRoot();
 
-    public void handleButtonAction(ActionEvent actionEvent) {
+    public void handleButtonAction(ActionEvent actionEvent) throws IOException {
         if (actionEvent.getSource() == validerBtn) {
             recupererAbsences();
+            SecretaireController.alertBoxDisplay("Absence mise à jour pour le "+listeDateLabel.getText());
         } else if (actionEvent.getSource() == datePicker) {
-            updateList();
+            if (datePicker.getValue().compareTo(LocalDate.now()) <= 0){
+                updateList();
+            }else{
+                tvApprenant.getItems().clear();
+                SecretaireController.alertBoxDisplay("Veuillez choisir une date passée");
+            }
+        }else if (actionEvent.getSource() == logoutBtn) {
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            App.setRoot("login");
+            stage.sizeToScene();
+            stage.centerOnScreen();
         }
 
     }

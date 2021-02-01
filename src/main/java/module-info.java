@@ -7,6 +7,7 @@ module ma.youcode {
     requires commons.validator;
     requires java.prefs;
     requires jbcrypt;
+    requires javax.mail;
 
 
     opens ma.youcode.main to javafx.fxml;

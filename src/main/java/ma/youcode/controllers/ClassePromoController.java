@@ -17,8 +17,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("unchecked")
 public class ClassePromoController implements Initializable {
 
+    @FXML
+    private Button logoutBtn;
     @FXML
     private Button userBtn;
     @FXML
@@ -79,7 +82,7 @@ public class ClassePromoController implements Initializable {
 
         } else if (actionEvent.getSource() == updateClasseBtn) {
             if (tfClasseId.getText().isEmpty()) {
-                classeError.setText("Veuillez ajouter le titre de la classe");
+                classeError.setText("Veuillez selectionner une classe");
                 return;
             } else if (tfClasseName.getText().isEmpty()) {
                 classeError.setText("Veuillez ajouter le titre de la classe");
@@ -91,7 +94,7 @@ public class ClassePromoController implements Initializable {
             }
         } else if (actionEvent.getSource() == deleteClasseBtn) {
             if (tfClasseId.getText().isEmpty()) {
-                classeError.setText("Veuillez entrer un id valide");
+                classeError.setText("Veuillez selectionner une classe");
                 return;
             }else{
                 admin.supprimerClasse(Integer.parseInt(tfClasseId.getText()));
@@ -109,7 +112,7 @@ public class ClassePromoController implements Initializable {
             }
         } else if (actionEvent.getSource() == updatePromoBtn) {
             if (tfPromoId.getText().isEmpty()) {
-                promoError.setText("Veuillez entrer un id valide");
+                promoError.setText("Veuillez selectionner une promo");
                 return;
             } else if (tfPromoName.getText().isEmpty()) {
                 promoError.setText("Veuillez ajouter le titre de la promo");
@@ -121,7 +124,7 @@ public class ClassePromoController implements Initializable {
             }
         } else if (actionEvent.getSource() == deletePromoBtn) {
             if (tfPromoId.getText().isEmpty()) {
-                promoError.setText("Veuillez entrer un id valide");
+                promoError.setText("Veuillez selectionner une promo");
                 return;
             }else{
                 admin.supprimerPromo(Integer.parseInt(tfPromoId.getText()));
@@ -132,6 +135,12 @@ public class ClassePromoController implements Initializable {
             Stage stage = (Stage) userBtn.getScene().getWindow();
             App.setRoot("admin");
             stage.sizeToScene();
+            stage.centerOnScreen();
+        }else if (actionEvent.getSource() == logoutBtn) {
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            App.setRoot("login");
+            stage.sizeToScene();
+            stage.centerOnScreen();
         }
     }
 

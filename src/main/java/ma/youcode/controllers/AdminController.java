@@ -6,25 +6,35 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ma.youcode.dao.AdminDaoImpl;
 import ma.youcode.main.App;
 import ma.youcode.models.Utilisateur;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.mindrot.jbcrypt.*;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
+@SuppressWarnings("unchecked")
 public class AdminController implements Initializable {
 
+    @FXML
+    private Button imageBtn;
+    @FXML
+    private Label tfImage;
+    @FXML
+    private Button logoutBtn;
     @FXML
     private Label labelId;
     @FXML
@@ -48,12 +58,9 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn colClasse;
     @FXML
-    private TableColumn colPassword;
-    @FXML
     private TextField tfNom;
     @FXML
     private TextField tfPrenom;
-
     @FXML
     private TextField tfTel;
     @FXML
@@ -89,12 +96,14 @@ public class AdminController implements Initializable {
 
     private int gKey;
 
-    Preferences userPreferences = Preferences.userRoot();
+    private FileInputStream fis;
+
+    private int fileLength;
+
     private AdminDaoImpl admin = new AdminDaoImpl();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         labelId.setVisible(false);
         tfId.setVisible(false);
         showUsers();
@@ -103,7 +112,24 @@ public class AdminController implements Initializable {
         cbClasse.setVisible(false);
     }
 
-    public void handleButtonAction(ActionEvent actionEvent) throws IOException {
+
+
+    public void handleButtonAction(ActionEvent actionEvent) throws IOException, MessagingException {
+
+        if (actionEvent.getSource() == imageBtn){
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Resource File");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"));
+            Stage mainStage =  (Stage) imageBtn.getScene().getWindow();
+            File selectedFile = fileChooser.showOpenDialog(mainStage);
+            if (selectedFile != null) {
+                tfImage.setText(selectedFile.getName());
+                fis = new FileInputStream(selectedFile);
+                fileLength = (int) selectedFile.length();
+            }
+        }
+
         //validation and action for add button
         if (actionEvent.getSource() == addBtn) {
             Utilisateur utilisateur = admin.afficherUtilisateurParEmail(tfEmail.getText());
@@ -116,7 +142,13 @@ public class AdminController implements Initializable {
             } else if (tfDateNaissance.getValue() == null) {
                 errorLabel.setText("Veuillez entrer une date valide");
                 return;
+            }else if (LocalDate.now().getYear() - tfDateNaissance.getValue().getYear() < 17) {
+                errorLabel.setText("L'utilisateur doit avoir au moins 17 ans");
+                return;
             } else if (tfTel.getText().isEmpty() || tfTel.getText().length() != 10) {
+                errorLabel.setText("Veuillez entrer un numero valide");
+                return;
+            }else if (isNumeric(tfTel.getText()) == false) {
                 errorLabel.setText("Veuillez entrer un numero valide");
                 return;
             } else if (!EmailValidator.getInstance().isValid(tfEmail.getText())) {
@@ -139,7 +171,7 @@ public class AdminController implements Initializable {
                 return;
             } else {
                 String hashed = BCrypt.hashpw(tfPassword.getText(), BCrypt.gensalt(12));
-                gKey = admin.creerUtilisateur(tfNom.getText(), tfPrenom.getText(), String.valueOf(tfDateNaissance.getValue()), tfTel.getText(), tfEmail.getText(), ((String) cbRole.getValue()), hashed);
+                gKey = admin.creerUtilisateur(tfNom.getText(), tfPrenom.getText(), String.valueOf(tfDateNaissance.getValue()), tfTel.getText(), tfEmail.getText(), ((String) cbRole.getValue()), hashed, fis, fileLength);
                 if (cbRole.getValue().equals("Apprenant")) {
                     admin.ajouterApprenant(gKey, ((String) cbClasse.getValue()), ((String) cbPromo.getValue()));
                 } else if (cbRole.getValue().equals("Formateur")) {
@@ -149,15 +181,21 @@ public class AdminController implements Initializable {
                 }
                 errorLabel.setText("Utilisateur créé");
                 showUsers();
+                sendEmail();
             }
 
             //validation and action for update button
 
         } else if (actionEvent.getSource() == updateBtn) {
-            Utilisateur utilisateur = admin.afficherUtilisateur(Integer.parseInt(tfId.getText()));
-            Utilisateur utilisateur2 = admin.afficherUtilisateurParEmail(tfEmail.getText());
+            Utilisateur utilisateur = null;
+            Utilisateur utilisateur2 = null;
+            if (!tfId.getText().isEmpty()) {
+                utilisateur = admin.afficherUtilisateur(Integer.parseInt(tfId.getText()));
+                utilisateur2 = admin.afficherUtilisateurParEmail(tfEmail.getText());
+            }
+
             if (tfId.getText().isEmpty()) {
-                errorLabel.setText("Veuillez entrer un Id valide");
+                errorLabel.setText("Veuillez selectionner un utilisateur");
                 return;
             } else if (tfNom.getText().isEmpty()) {
                 errorLabel.setText("Veuillez entrer un nom");
@@ -167,6 +205,9 @@ public class AdminController implements Initializable {
                 return;
             } else if (tfDateNaissance.getValue() == null) {
                 errorLabel.setText("Veuillez entrer une date valide");
+                return;
+            }else if (LocalDate.now().getYear() - tfDateNaissance.getValue().getYear() < 17) {
+                errorLabel.setText("L'utilisateur doit avoir au moins 17 ans");
                 return;
             } else if (tfTel.getText().isEmpty() || tfTel.getText().length() != 10) {
                 errorLabel.setText("Veuillez entrer un numero valide");
@@ -187,8 +228,7 @@ public class AdminController implements Initializable {
                 errorLabel.setText("Veuillez choisir une Promo");
                 return;
             } else {
-                String hashed = BCrypt.hashpw(tfPassword.getText(), BCrypt.gensalt(12));
-                admin.modifierUtilisateur(Integer.parseInt(tfId.getText()), tfNom.getText(), tfPrenom.getText(), String.valueOf(tfDateNaissance.getValue()), tfTel.getText(), tfEmail.getText(), ((String) cbRole.getValue()));
+                admin.modifierUtilisateur(Integer.parseInt(tfId.getText()), tfNom.getText(), tfPrenom.getText(), String.valueOf(tfDateNaissance.getValue()), tfTel.getText(), tfEmail.getText(), ((String) cbRole.getValue()), fis, fileLength);
                 if (cbRole.getValue().equals("Apprenant")) {
                     admin.modifierApprenant(Integer.parseInt(tfId.getText()), ((String) cbClasse.getValue()), ((String) cbPromo.getValue()));
                 } else if (cbRole.getValue().equals("Formateur")) {
@@ -203,7 +243,7 @@ public class AdminController implements Initializable {
         } else if (actionEvent.getSource() == deleteBtn) {
 
             if (tfId.getText().isEmpty()) {
-                errorLabel.setText("Veuillez entrer un Id valide");
+                errorLabel.setText("Veuillez selectionner un utilisateur");
                 return;
             } else {
                 Utilisateur utilisateur = admin.afficherUtilisateur(Integer.parseInt(tfId.getText()));
@@ -221,7 +261,7 @@ public class AdminController implements Initializable {
             }
         }else if (actionEvent.getSource() == editPasswordBtn) {
             if (tfId.getText().isEmpty()) {
-                errorLabel.setText("Veuillez entrer un Id valide");
+                errorLabel.setText("Veuillez selectionner un utilisateur");
                 return;
             } else if (tfPassword.getText().length() < 8) {
                 errorLabel.setText("Veuillez entrer un mot de passe avec un minimum de 8 caracteres");
@@ -230,6 +270,7 @@ public class AdminController implements Initializable {
                 String hashed = BCrypt.hashpw(tfPassword.getText(), BCrypt.gensalt(12));
                 admin.modifierPassword(Integer.parseInt(tfId.getText()), hashed);
                 showSearchResult();
+                sendEmail();
             }
         } else if (actionEvent.getSource() == searchBtn) {
             System.out.println("search clicked");
@@ -238,6 +279,12 @@ public class AdminController implements Initializable {
             Stage stage = (Stage) cpBtn.getScene().getWindow();
             App.setRoot("classePromo");
             stage.sizeToScene();
+            stage.centerOnScreen();
+        }else if (actionEvent.getSource() == logoutBtn) {
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            App.setRoot("login");
+            stage.sizeToScene();
+            stage.centerOnScreen();
         }
     }
 
@@ -319,7 +366,59 @@ public class AdminController implements Initializable {
             cbRole.setValue("" + user.getRole());
             cbPromo.setValue("" + user.getPromo());
             cbClasse.setValue("" + user.getClasse());
+            tfPassword.setText("");
         }
+    }
+
+    public void sendEmail() throws MessagingException {
+
+        String text = "Bonjour, "+tfNom.getText()+" "+tfPrenom.getText()+"\n \n"
+                + "Pour vous connecter et visualiser l'état de vos absences dans l'application de "
+                +"gestion d'absences de YouCode,\n" +
+                "veuillez utiliser l'identifiant et le mot de passe" +
+                " ci-dessous: \n \n"
+                +"Identifiant : "+tfEmail.getText()+"\n" +
+                "Mot de passe : "+tfPassword.getText()+"\n \n \n" +
+                "YouCode 2021";
+
+        String host = "smtp.gmail.com";
+        String to = tfEmail.getText();
+        String username = "youcode.absence@gmail.com";
+        String password = "youcode2021";
+
+        Properties prpos = System.getProperties();
+        prpos.put("mail.smtp.auth", true);
+        prpos.put("mail.smtp.starttls.enable", true);
+        prpos.put("mail.smtp.host", host);
+        prpos.put("mail.smtp.port", "587");
+
+        Session session = Session.getDefaultInstance(prpos, new javax.mail.Authenticator(){
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        MimeMessage m = new MimeMessage(session);
+        m.setFrom(new InternetAddress(username));
+        m.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress((to)));
+        m.setSubject("Identifiant et mot de passe pour l'application de gestion d'absences");
+        m.setText(text);
+
+        Transport.send(m);
+        System.out.println("Message sent");
+    }
+
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            Long d = Long.parseLong(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
 
